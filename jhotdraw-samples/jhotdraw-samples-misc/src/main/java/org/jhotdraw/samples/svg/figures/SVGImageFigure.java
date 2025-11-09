@@ -452,6 +452,9 @@ public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, Im
 
     @Override
     public void loadImage(File file) throws IOException {
+        // The input file should never be null.
+        assert file != null : "File argument must not be null when attempting to load image.";
+
         InputStream in = new FileInputStream(file);
         try {
             loadImage(in);
@@ -467,12 +470,15 @@ public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, Im
 
     @Override
     public void loadImage(InputStream in) throws IOException {
+        // The input inputstream should never be null.
+        assert in != null : "InputStream argument must not be null.";
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf = new byte[512];
         int bytesRead;
         while ((bytesRead = in.read(buf)) > 0) {
             baos.write(buf, 0, bytesRead);
         }
+        assert baos.size() > 0 : "Image data buffer size is zero after reading the stream, indicating failure to read any data.";
         BufferedImage img;
         try {
             img = ImageIO.read(new ByteArrayInputStream(baos.toByteArray()));

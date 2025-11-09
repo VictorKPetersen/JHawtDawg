@@ -45,14 +45,14 @@ public class SVGViewTest {
     }
     @Test
     public void testGetSelectedInputFormat_boundaryCase_nullChooser() {
-        InputFormat actualFormat = svgView.getSelectedInputFormat(null, mockDrawing);
+        InputFormat actualFormat = svgView.getSelectedInputFormat(null);
 
         assertNull("Should return null when the URIChooser is null", actualFormat);
     }
 
     @Test
     public void testGetSelectedInputFormat_boundaryCase_noMap() {
-        InputFormat actualFormat = svgView.getSelectedInputFormat(mockChooser, mockDrawing);
+        InputFormat actualFormat = svgView.getSelectedInputFormat(mockChooser);
 
         assertNull("Should return null when the client property map is null", actualFormat);
     }

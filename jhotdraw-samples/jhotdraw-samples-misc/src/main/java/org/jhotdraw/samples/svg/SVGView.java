@@ -133,9 +133,12 @@ public class SVGView extends AbstractView {
     @SuppressWarnings("unchecked")
     @Override
     public void read(final URI uri, URIChooser chooser) throws IOException {
+        assert uri != null : "File URI must not be null.";
+        assert chooser != null : "URIChooser must not be null.";
+
         JFileURIChooser fc = (JFileURIChooser) chooser;
         Drawing drawing = createDrawing();
-        InputFormat format = getSelectedInputFormat(fc, drawing);
+        InputFormat format = getSelectedInputFormat(fc);
         boolean success = tryReadWithFormat(uri, drawing, format);
 
         if (!success) success = tryReadWithAllFormats(uri, drawing, format);
@@ -144,7 +147,7 @@ public class SVGView extends AbstractView {
         updateDrawingOnEDT(drawing);
     }
 
-    protected InputFormat getSelectedInputFormat(JFileURIChooser fc, Drawing drawing) {
+    protected InputFormat getSelectedInputFormat(JFileURIChooser fc) {
         if (fc == null) return null;
         HashMap<FileFilter, InputFormat> map =
                 (HashMap<FileFilter, InputFormat>) fc.getClientProperty(SVGApplicationModel.INPUT_FORMAT_MAP_CLIENT_PROPERTY);
@@ -155,6 +158,9 @@ public class SVGView extends AbstractView {
     }
 
     protected boolean tryReadWithFormat(URI uri, Drawing drawing, InputFormat format) {
+        assert uri != null : "URI argument must not be null.";
+        assert drawing != null : "Drawing argument must not be null.";
+
         if (format == null) return false;
         try {
             format.read(uri, drawing, true);
@@ -165,6 +171,8 @@ public class SVGView extends AbstractView {
     }
 
     protected boolean tryReadWithAllFormats(URI uri, Drawing drawing, InputFormat selected) {
+        assert uri != null : "URI argument must not be null.";
+        assert drawing != null : "Drawing argument must not be null.";
         for (InputFormat fmt : drawing.getInputFormats()) {
             if (fmt == selected) continue;
             if (tryReadWithFormat(uri, drawing, fmt)) return true;
