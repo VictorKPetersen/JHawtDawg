@@ -147,14 +147,20 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     }
 
     private void drawRight(Path2D.Double p, Position pos, Size size, Rotation rot) {
-        p.lineTo((pos.x() + size.width()), (pos.y() + size.height() - rot.ry()));
-        p.curveTo((pos.x() + size.width()), (pos.y() + size.height() - rot.ry() * ACV), (pos.x() + size.width() -rot.rx() * ACV), (pos.y() + size.height()), (pos.x() + size.width() -rot.rx()), (pos.y() + size.height()));
+        double x1 = pos.x() + size.width();
+        double y1 = pos.y() + size.height() - rot.ry() * ACV;
+        double x2 = pos.x() + size.width() - rot.rx() * ACV;
+        double y2 = pos.y() + size.height();
+        double x3 = pos.x() + size.width() -rot.rx();
+        double y3 = pos.y() + size.height();
+
+        p.lineTo(x1, (y2 - rot.ry()));
+        p.curveTo(x1, y1, x2, y2, x3, y3);
     }
 
     private void drawBottom(Path2D.Double p, Position pos, Size size, Rotation rot) {
         p.lineTo((pos.x() +rot.rx()), (pos.y() + size.height()));
         p.curveTo((pos.x() +rot.rx() * ACV), (pos.y() + size.height()), (pos.x()), (pos.y() + size.height() - rot.ry() * ACV), (float) pos.x(), (pos.y() + size.height() - rot.ry()));
-
     }
 
     private void drawLeft(Path2D.Double p, Position pos, Rotation rot){
@@ -303,9 +309,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     @Override
     public void transform(AffineTransform tx) {
         invalidateTransformedShape();
-        if (get(TRANSFORM) != null ||
-                //              (tx.getType() & (AffineTransform.TYPE_TRANSLATION | AffineTransform.TYPE_MASK_SCALE)) != tx.getType()) {
-                (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
+        if (get(TRANSFORM) != null || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
             if (get(TRANSFORM) == null) {
                 set(TRANSFORM, (AffineTransform) tx.clone());
             } else {
