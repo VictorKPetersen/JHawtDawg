@@ -1,0 +1,136 @@
+{
+  "className": "org.jhotdraw.samples.svg.figures.DrawSVGRectBDDTest",
+  "name": "Draw SVG Rect BDD",
+  "scenarios": [
+    {
+      "className": "org.jhotdraw.samples.svg.figures.DrawSVGRectBDDTest",
+      "testMethodName": "userDrawsRectangle",
+      "description": "User draws rectangle",
+      "tagIds": [],
+      "explicitParameters": [],
+      "derivedParameters": [],
+      "scenarioCases": [
+        {
+          "caseNr": 1,
+          "steps": [
+            {
+              "name": "user is on drawing canvas",
+              "words": [
+                {
+                  "value": "Given",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "user is on drawing canvas"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 152177300,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "user selects rectangle tool",
+              "words": [
+                {
+                  "value": "When",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "user selects rectangle tool"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 174900,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "user drags rect from start point to end point",
+              "words": [
+                {
+                  "value": "and",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "user drags rect from start point to end point"
+                },
+                {
+                  "value": "10",
+                  "argumentInfo": {
+                    "argumentName": "x1",
+                    "formattedValue": "10"
+                  }
+                },
+                {
+                  "value": "10",
+                  "argumentInfo": {
+                    "argumentName": "y1",
+                    "formattedValue": "10"
+                  }
+                },
+                {
+                  "value": "50",
+                  "argumentInfo": {
+                    "argumentName": "x2",
+                    "formattedValue": "50"
+                  }
+                },
+                {
+                  "value": "50",
+                  "argumentInfo": {
+                    "argumentName": "y2",
+                    "formattedValue": "50"
+                  }
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 51896900,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "created rect should have those dimensions",
+              "words": [
+                {
+                  "value": "Then",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "created rect should have those dimensions"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 186259300,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "created rect should be on canvas",
+              "words": [
+                {
+                  "value": "and",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "created rect should be on canvas"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 24658700,
+              "depth": 0,
+              "parentFailed": false
+            }
+          ],
+          "explicitArguments": [],
+          "derivedArguments": [],
+          "status": "SUCCESS",
+          "durationInNanos": 465163500
+        }
+      ],
+      "casesAsTable": false,
+      "durationInNanos": 465163500
+    }
+  ],
+  "tagMap": {}
+}
