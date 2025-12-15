@@ -6,7 +6,6 @@ import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 import org.jhotdraw.draw.Drawing;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
 public class WhenDrawingRectangle extends Stage<WhenDrawingRectangle> {
     @ExpectedScenarioState
