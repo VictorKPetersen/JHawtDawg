@@ -139,10 +139,6 @@ public class UndoRedoManager extends UndoManager { //javax.swing.undo.UndoManage
         redoAction = new RedoAction();
     }
 
-    public void setLocale(Locale l) {
-        labels = ResourceBundleUtil.getBundle("org.jhotdraw.undo.Labels", l);
-    }
-
     /**
      * Discards all edits.
      */
