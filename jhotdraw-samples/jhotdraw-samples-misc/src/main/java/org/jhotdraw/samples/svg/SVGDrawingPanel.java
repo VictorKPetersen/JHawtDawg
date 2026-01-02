@@ -244,47 +244,17 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
      * interface, until the drawing is read.
      */
     public void read(URI f) throws IOException {
-        // Create a new drawing object
         Drawing newDrawing = createDrawing();
-        if (newDrawing.getInputFormats().size() == 0) {
-            throw new InternalError("Drawing object has no input formats.");
-        }
-        // Try out all input formats until we succeed
+        validateDrawing(newDrawing);
+
         IOException firstIOException = null;
         for (InputFormat format : newDrawing.getInputFormats()) {
             try {
                 format.read(f, newDrawing);
-                final Drawing loadedDrawing = newDrawing;
-                Runnable r = new Runnable() {
-                    @Override
-                    public void run() {
-                        // Set the drawing on the Event Dispatcher Thread
-                        setDrawing(loadedDrawing);
-                    }
-                };
-                if (SwingUtilities.isEventDispatchThread()) {
-                    r.run();
-                } else {
-                    try {
-                        SwingUtilities.invokeAndWait(r);
-                    } catch (InterruptedException ex) {
-                        // suppress silently
-                    } catch (InvocationTargetException ex) {
-                        InternalError ie = new InternalError("Error setting drawing.");
-                        ie.initCause(ex);
-                        throw ie;
-                    }
-                }
-                // We get here if reading was successful.
-                // We can return since we are done.
+                updateDrawingOnEDT(newDrawing);
                 return;
             } catch (IOException e) {
-                // We get here if reading failed.
-                // We only preserve the exception of the first input format,
-                // because that's the one which is best suited for this drawing.
-                if (firstIOException == null) {
-                    firstIOException = e;
-                }
+                if (firstIOException == null) firstIOException = e;
             }
         }
         throw firstIOException;
@@ -303,35 +273,35 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
             read(f);
             return;
         }
-        // Create a new drawing object
+
         Drawing newDrawing = createDrawing();
-        if (newDrawing.getInputFormats().size() == 0) {
-            throw new InternalError("Drawing object has no input formats.");
-        }
+        validateDrawing(newDrawing);
+
         format.read(f, newDrawing);
-        final Drawing loadedDrawing = newDrawing;
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                // Set the drawing on the Event Dispatcher Thread
-                setDrawing(loadedDrawing);
-            }
-        };
+        updateDrawingOnEDT(newDrawing);
+    }
+
+    private void updateDrawingOnEDT(final Drawing loadedDrawing) {
+        Runnable r = () -> setDrawing(loadedDrawing);
+
         if (SwingUtilities.isEventDispatchThread()) {
             r.run();
         } else {
             try {
                 SwingUtilities.invokeAndWait(r);
             } catch (InterruptedException ex) {
-                // suppress silently
+                Thread.currentThread().interrupt();
             } catch (InvocationTargetException ex) {
-                InternalError ie = new InternalError("Error setting drawing.");
-                ie.initCause(ex);
-                throw ie;
+                throw new InternalError("Error setting drawing.", ex);
             }
         }
     }
 
+    private void validateDrawing(Drawing drawing) {
+        if (drawing.getInputFormats().isEmpty()) {
+            throw new InternalError("Drawing object has no input formats.");
+        }
+    }
     /**
      * Writes the drawing from the SVGDrawingPanel into a file.
      * <p>
