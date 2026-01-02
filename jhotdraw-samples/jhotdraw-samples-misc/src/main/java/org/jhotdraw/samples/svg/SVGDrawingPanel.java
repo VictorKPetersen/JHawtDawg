@@ -243,14 +243,14 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
      * Calling it from the Event Dispatcher Thread will block the user
      * interface, until the drawing is read.
      */
-    public void read(URI f) throws IOException {
+    public void read(URI uri) throws IOException {
         Drawing newDrawing = createDrawing();
         validateDrawing(newDrawing);
 
         IOException firstIOException = null;
         for (InputFormat format : newDrawing.getInputFormats()) {
             try {
-                format.read(f, newDrawing);
+                format.read(uri, newDrawing);
                 updateDrawingOnEDT(newDrawing);
                 return;
             } catch (IOException e) {
@@ -268,16 +268,16 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
      * Calling it from the Event Dispatcher Thread will block the user
      * interface, until the drawing is read.
      */
-    public void read(URI f, InputFormat format) throws IOException {
+    public void read(URI uri, InputFormat format) throws IOException {
         if (format == null) {
-            read(f);
+            read(uri);
             return;
         }
 
         Drawing newDrawing = createDrawing();
         validateDrawing(newDrawing);
 
-        format.read(f, newDrawing);
+        format.read(uri, newDrawing);
         updateDrawingOnEDT(newDrawing);
     }
 
@@ -302,6 +302,7 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
             throw new InternalError("Drawing object has no input formats.");
         }
     }
+
     /**
      * Writes the drawing from the SVGDrawingPanel into a file.
      * <p>
@@ -310,44 +311,17 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
      * interface, until the drawing is written.
      */
     public void write(URI uri) throws IOException {
-        // Defensively clone the drawing object, so that we are not
-        // affected by changes of the drawing while we write it into the file.
-        final Drawing[] helper = new Drawing[1];
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                helper[0] = (Drawing) getDrawing().clone();
-            }
-        };
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InterruptedException ex) {
-                // suppress silently
-            } catch (InvocationTargetException ex) {
-                InternalError ie = new InternalError("Error getting drawing.");
-                ie.initCause(ex);
-                throw ie;
-            }
-        }
-        Drawing saveDrawing = helper[0];
-        if (saveDrawing.getOutputFormats().size() == 0) {
-            throw new InternalError("Drawing object has no output formats.");
-        }
-        // Try out all output formats until we find one which accepts the
-        // filename entered by the user.
-        File f = new File(uri);
-        for (OutputFormat format : saveDrawing.getOutputFormats()) {
-            if (format.getFileFilter().accept(f)) {
-                format.write(uri, saveDrawing);
-                // We get here if writing was successful.
-                // We can return since we are done.
+        Drawing drawingSnapshot = getDrawingSnapshotFromEDT();
+        validateOutputFormats(drawingSnapshot);
+
+        File file = new File(uri);
+        for (OutputFormat format : drawingSnapshot.getOutputFormats()) {
+            if (format.getFileFilter().accept(file)) {
+                format.write(uri, drawingSnapshot);
                 return;
             }
         }
-        throw new IOException("No output format for " + f.getName());
+        throw new IOException("No output format for " + file.getName());
     }
 
     /**
@@ -358,60 +332,38 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
      * Calling it from the Event Dispatcher Thread will block the user
      * interface, until the drawing is written.
      */
-    public void write(URI f, OutputFormat format) throws IOException {
+    public void write(URI uri, OutputFormat format) throws IOException {
         if (format == null) {
-            write(f);
+            write(uri);
             return;
         }
-        // Defensively clone the drawing object, so that we are not
-        // affected by changes of the drawing while we write it into the file.
-        final Drawing[] helper = new Drawing[1];
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                helper[0] = (Drawing) getDrawing().clone();
-            }
-        };
+
+        Drawing drawingSnapshot = getDrawingSnapshotFromEDT();
+        format.write(uri, drawingSnapshot);
+    }
+
+    private Drawing getDrawingSnapshotFromEDT() {
         if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InterruptedException ex) {
-                // suppress silently
-            } catch (InvocationTargetException ex) {
-                InternalError ie = new InternalError("Error getting drawing.");
-                ie.initCause(ex);
-                throw ie;
-            }
+            return (Drawing) getDrawing().clone();
         }
-        // Write drawing to file
-        Drawing saveDrawing = helper[0];
-        format.write(f, saveDrawing);
+
+        final Drawing[] helper = new Drawing[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> helper[0] = (Drawing) getDrawing().clone());
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        } catch (InvocationTargetException ex) {
+            throw new InternalError("Error getting drawing.", ex);
+        }
+        return helper[0];
     }
 
-    /**
-     * Sets the actions for the "Action" popup menu in the toolbar.
-     * <p>
-     * This list may contain null items which are used to denote a
-     * separator in the popup menu.
-     * <p>
-     * Set this to null to set the drop down menus to the default actions.
-     */
-    public void setPopupActions(List<Action> actions) {
-        actionToolBar.setPopupActions(actions);
+    private void validateOutputFormats(Drawing drawing) {
+        if (drawing.getOutputFormats().isEmpty()) {
+            throw new InternalError("Drawing object has no output formats.");
+        }
     }
 
-    /**
-     * Gets the actions of the "Action" popup menu in the toolbar.
-     * This list may contain null items which are used to denote a
-     * separator in the popup menu.
-     *
-     * @return An unmodifiable list with actions.
-     */
-    public List<Action> getPopupActions() {
-        return actionToolBar.getPopupActions();
-    }
 
     public JComponent getComponent() {
         return this;
