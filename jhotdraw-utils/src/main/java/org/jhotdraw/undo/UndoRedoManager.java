@@ -120,6 +120,13 @@ public class UndoRedoManager extends UndoManager { //javax.swing.undo.UndoManage
      */
     public UndoRedoManager() {
         getLabels();
+        assert labels != null : "ResourceBundle did not load.";
+        undoAction = new UndoAction();
+        redoAction = new RedoAction();
+    }
+
+    public UndoRedoManager(ResourceBundleUtil labels) {
+        this.labels = labels;
         undoAction = new UndoAction();
         redoAction = new RedoAction();
     }
@@ -236,6 +243,7 @@ public class UndoRedoManager extends UndoManager { //javax.swing.undo.UndoManage
     }
 
     private void executeUndoRedoOperation(UndoRedoOperation operation) throws CannotUndoException, CannotRedoException {
+        assert !undoOrRedoInProgress : "An UndoRedoOperation is already in progress.";
         undoOrRedoInProgress = true;
         try {
             operation.execute();
