@@ -32,17 +32,29 @@ public class UndoRedoManagerTest {
     }
 
     @Test
-    public void addSignificantEdit() {
+    public void addSignificantEditUpdatesInstance() {
         instance.addEdit(significantEdit);
 
         assertTrue(instance.hasSignificantEdits());
     }
 
     @Test
-    public void addNonSignificantEdit() {
+    public void addSignificantEditReturnsTrue() {
+        boolean result = instance.addEdit(significantEdit);
+        assertTrue(result);
+    }
+
+    @Test
+    public void addNonSignificantEditUpdatesInstance() {
         instance.addEdit(nonSignificantEdit);
 
         assertFalse(instance.hasSignificantEdits());
+    }
+
+    @Test
+    public void addNonSignificantEditReturnsTrue() {
+        boolean result = instance.addEdit(nonSignificantEdit);
+        assertTrue(result);
     }
 
     @Test
