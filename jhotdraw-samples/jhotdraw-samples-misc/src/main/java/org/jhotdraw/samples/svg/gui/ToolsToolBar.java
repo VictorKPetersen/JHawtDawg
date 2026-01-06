@@ -90,7 +90,8 @@ public class ToolsToolBar extends AbstractToolBar {
             p.add(btn, gbc);
             labels.configureToolBarButton(btn, "selectionTool");
             attributes = new HashMap<AttributeKey<?>, Object>();
-            btn = ButtonFactory.addToolTo(this, editor, creationTool = new CreationTool(new SVGRectFigure(), attributes), "createRectangle", labels);
+            creationTool = new CreationTool(new SVGRectFigure(), attributes);
+            btn = ButtonFactory.addToolTo(this, editor, creationTool, "createRectangle", labels);
             creationTool.setToolDoneAfterCreation(false);
             btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
             gbc = new GridBagConstraints();
@@ -98,7 +99,8 @@ public class ToolsToolBar extends AbstractToolBar {
             gbc.gridy = 1;
             gbc.insets = new Insets(3, 0, 0, 0);
             p.add(btn, gbc);
-            btn = ButtonFactory.addToolTo(this, editor, creationTool = new CreationTool(new SVGEllipseFigure(), attributes), "createEllipse", labels);
+            creationTool = new CreationTool(new SVGEllipseFigure(), attributes);
+            btn = ButtonFactory.addToolTo(this, editor, creationTool, "createEllipse", labels);
             creationTool.setToolDoneAfterCreation(false);
             btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
             gbc = new GridBagConstraints();
@@ -117,7 +119,8 @@ public class ToolsToolBar extends AbstractToolBar {
             attributes = new HashMap<AttributeKey<?>, Object>();
             attributes.put(AttributeKeys.FILL_COLOR, null);
             attributes.put(PATH_CLOSED, false);
-            btn = ButtonFactory.addToolTo(this, editor, creationTool = new CreationTool(new SVGPathFigure(), attributes), "createLine", labels);
+            creationTool = new CreationTool(new SVGPathFigure(), attributes);
+            btn = ButtonFactory.addToolTo(this, editor, creationTool, "createLine", labels);
             creationTool.setToolDoneAfterCreation(false);
             btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
             gbc = new GridBagConstraints();
@@ -125,7 +128,8 @@ public class ToolsToolBar extends AbstractToolBar {
             gbc.gridy = 0;
             gbc.insets = new Insets(0, 3, 0, 0);
             p.add(btn, gbc);
-            btn = ButtonFactory.addToolTo(this, editor, pathTool = new PathTool(new SVGPathFigure(), new SVGBezierFigure(false), attributes), "createScribble", labels);
+            pathTool = new PathTool(new SVGPathFigure(), new SVGBezierFigure(false), attributes);
+            btn = ButtonFactory.addToolTo(this, editor, pathTool, "createScribble", labels);
             pathTool.setToolDoneAfterCreation(false);
             btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
             gbc = new GridBagConstraints();
@@ -136,7 +140,8 @@ public class ToolsToolBar extends AbstractToolBar {
             attributes = new HashMap<AttributeKey<?>, Object>();
             attributes.put(AttributeKeys.FILL_COLOR, Color.black);
             attributes.put(AttributeKeys.STROKE_COLOR, null);
-            btn = ButtonFactory.addToolTo(this, editor, textTool = new TextCreationTool(new SVGTextFigure(), attributes), "createText", labels);
+            textTool = new TextCreationTool(new SVGTextFigure(), attributes);
+            btn = ButtonFactory.addToolTo(this, editor, textTool, "createText", labels);
             textTool.setToolDoneAfterCreation(true);
             btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
             gbc = new GridBagConstraints();
@@ -157,7 +162,8 @@ public class ToolsToolBar extends AbstractToolBar {
             attributes = new HashMap<AttributeKey<?>, Object>();
             attributes.put(AttributeKeys.FILL_COLOR, null);
             attributes.put(AttributeKeys.STROKE_COLOR, null);
-            btn = ButtonFactory.addToolTo(this, editor, imageTool = new SVGCreateFromFileTool(new SVGImageFigure(), new SVGGroupFigure(), attributes), "createImage", labels);
+            imageTool = new SVGCreateFromFileTool(new SVGImageFigure(), new SVGGroupFigure(), attributes);
+            btn = ButtonFactory.addToolTo(this, editor, imageTool, "createImage", labels);
             imageTool.setToolDoneAfterCreation(true);
             imageTool.setUseFileDialog(true);
             btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));

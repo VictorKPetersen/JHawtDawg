@@ -65,7 +65,8 @@ public class ArrangeToolBar extends AbstractToolBar {
             GridBagConstraints gbc;
             AbstractButton btn;
             AbstractSelectedAction d;
-            btn = new JButton(d = new BringToFrontAction(editor));
+            d = new BringToFrontAction(editor);
+            btn = new JButton(d);
             disposables.add(d);
             btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
             btn.setText(null);
@@ -75,7 +76,8 @@ public class ArrangeToolBar extends AbstractToolBar {
             gbc.gridy = 0;
             gbc.anchor = GridBagConstraints.EAST;
             p.add(btn, gbc);
-            btn = new JButton(d = new SendToBackAction(editor));
+            d = new SendToBackAction(editor);
+            btn = new JButton(d);
             disposables.add(d);
             btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
             btn.setText(null);
