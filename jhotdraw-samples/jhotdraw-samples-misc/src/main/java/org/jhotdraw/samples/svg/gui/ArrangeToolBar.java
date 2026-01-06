@@ -51,46 +51,43 @@ public class ArrangeToolBar extends AbstractToolBar {
     @Override
     protected JComponent createDisclosedComponent(int state) {
         JPanel p = null;
-        switch (state) {
-            case 1: 
-                p = new JPanel();
-                p.setOpaque(false);
-                p.setBorder(new EmptyBorder(5, 5, 5, 8));
-                // Abort if no editor is set
-                if (editor == null) {
-                    break;
-                }
-                ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.samples.svg.Labels");
-                GridBagLayout layout = new GridBagLayout();
-                p.setLayout(layout);
-                GridBagConstraints gbc;
-                AbstractButton btn;
-                AbstractSelectedAction d;
-                btn = new JButton(d = new BringToFrontAction(editor));
-                disposables.add(d);
-                btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
-                btn.setText(null);
-                labels.configureToolBarButton(btn, BringToFrontAction.ID);
-                btn.putClientProperty("hideActionText", Boolean.TRUE);
-                gbc = new GridBagConstraints();
-                gbc.gridy = 0;
-                gbc.anchor = GridBagConstraints.EAST;
-                p.add(btn, gbc);
-                btn = new JButton(d = new SendToBackAction(editor));
-                disposables.add(d);
-                btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
-                btn.setText(null);
-                labels.configureToolBarButton(btn, SendToBackAction.ID);
-                btn.putClientProperty("hideActionText", Boolean.TRUE);
-                btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
-                gbc = new GridBagConstraints();
-                gbc.gridy = 1;
-                gbc.insets = new Insets(3, 0, 0, 0);
-                gbc.anchor = GridBagConstraints.NORTH;
-                gbc.weighty = 1f;
-                p.add(btn, gbc);
-
-            break;
+        if (state == 1) {
+            p = new JPanel();
+            p.setOpaque(false);
+            p.setBorder(new EmptyBorder(5, 5, 5, 8));
+            // Abort if no editor is set
+            if (editor == null) {
+                return p;
+            }
+            ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.samples.svg.Labels");
+            GridBagLayout layout = new GridBagLayout();
+            p.setLayout(layout);
+            GridBagConstraints gbc;
+            AbstractButton btn;
+            AbstractSelectedAction d;
+            btn = new JButton(d = new BringToFrontAction(editor));
+            disposables.add(d);
+            btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
+            btn.setText(null);
+            labels.configureToolBarButton(btn, BringToFrontAction.ID);
+            btn.putClientProperty("hideActionText", Boolean.TRUE);
+            gbc = new GridBagConstraints();
+            gbc.gridy = 0;
+            gbc.anchor = GridBagConstraints.EAST;
+            p.add(btn, gbc);
+            btn = new JButton(d = new SendToBackAction(editor));
+            disposables.add(d);
+            btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
+            btn.setText(null);
+            labels.configureToolBarButton(btn, SendToBackAction.ID);
+            btn.putClientProperty("hideActionText", Boolean.TRUE);
+            btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
+            gbc = new GridBagConstraints();
+            gbc.gridy = 1;
+            gbc.insets = new Insets(3, 0, 0, 0);
+            gbc.anchor = GridBagConstraints.NORTH;
+            gbc.weighty = 1f;
+            p.add(btn, gbc);
         }
         return p;
     }
