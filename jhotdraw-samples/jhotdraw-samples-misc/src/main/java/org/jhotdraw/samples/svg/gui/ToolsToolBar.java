@@ -174,22 +174,15 @@ public class ToolsToolBar extends AbstractToolBar {
 
     public Collection<Action> createSelectionActions(DrawingEditor editor) {
         LinkedList<Action> list = new LinkedList<Action>();
-        AbstractSelectedAction a;
         list.add(new DuplicateAction());
         list.add(null); // separator
-        list.add(a = new GroupAction(editor, new SVGGroupFigure()));
-        disposables.add(a);
-        list.add(a = new UngroupAction(editor, new SVGGroupFigure()));
-        disposables.add(a);
-        list.add(a = new CombineAction(editor));
-        disposables.add(a);
-        list.add(a = new SplitAction(editor));
-        disposables.add(a);
+        addSelectionAction(list, new GroupAction(editor, new SVGGroupFigure()));
+        addSelectionAction(list, new UngroupAction(editor, new SVGGroupFigure()));
+        addSelectionAction(list, new CombineAction(editor));
+        addSelectionAction(list, new SplitAction(editor));
         list.add(null); // separator
-        list.add(a = new BringToFrontAction(editor));
-        disposables.add(a);
-        list.add(a = new SendToBackAction(editor));
-        disposables.add(a);
+        addSelectionAction(list, new BringToFrontAction(editor));
+        addSelectionAction(list, new SendToBackAction(editor));
         return list;
     }
 
@@ -201,6 +194,11 @@ public class ToolsToolBar extends AbstractToolBar {
     @Override
     protected int getDefaultDisclosureState() {
         return 1;
+    }
+
+    private void addSelectionAction(LinkedList<Action> list, AbstractSelectedAction action) {
+        list.add(action);
+        disposables.add(action);
     }
 
     private static class SelectionToolButtonHandler extends MouseAdapter {
