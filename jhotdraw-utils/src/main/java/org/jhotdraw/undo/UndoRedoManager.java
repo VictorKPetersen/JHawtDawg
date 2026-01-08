@@ -203,35 +203,27 @@ public class UndoRedoManager extends UndoManager { //javax.swing.undo.UndoManage
         return redoAction;
     }
 
-    /**
-     * Updates the properties of the UndoAction
-     * and of the RedoAction.
-     */
     private void updateActions() {
-        String label;
         if (DEBUG) {
-            System.out.println("UndoRedoManager@" + hashCode() + ".updateActions "
-                    + editToBeUndone()
-                    + " canUndo=" + canUndo() + " canRedo=" + canRedo());
+            logDebugState();
         }
-        if (canUndo()) {
-            undoAction.setEnabled(true);
-            label = getUndoPresentationName();
-        } else {
-            undoAction.setEnabled(false);
-            label = labels.getString("edit.undo.text");
-        }
-        undoAction.putValue(Action.NAME, label);
-        undoAction.putValue(Action.SHORT_DESCRIPTION, label);
-        if (canRedo()) {
-            redoAction.setEnabled(true);
-            label = getRedoPresentationName();
-        } else {
-            redoAction.setEnabled(false);
-            label = labels.getString("edit.redo.text");
-        }
-        redoAction.putValue(Action.NAME, label);
-        redoAction.putValue(Action.SHORT_DESCRIPTION, label);
+
+        updateActionState(undoAction, canUndo(), getUndoPresentationName(), "edit.undo.text");
+        updateActionState(redoAction, canRedo(), getRedoPresentationName(), "edit.redo.text");
+    }
+
+    private void updateActionState(Action action, boolean canPerform, String presentationName, String defaultLabelKey) {
+        action.setEnabled(canPerform);
+
+        String label = canPerform ? presentationName : labels.getString(defaultLabelKey);
+
+        action.putValue(Action.NAME, label);
+        action.putValue(Action.SHORT_DESCRIPTION, label);
+    }
+
+    private void logDebugState() {
+        System.out.println(String.format("UndoRedoManager@%d.updateActions %s canUndo=%b canRedo=%b",
+                hashCode(), editToBeUndone(), canUndo(), canRedo()));
     }
 
     /**
