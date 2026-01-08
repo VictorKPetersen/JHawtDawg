@@ -133,63 +133,69 @@ public class SVGView extends AbstractView {
     @SuppressWarnings("unchecked")
     @Override
     public void read(final URI uri, URIChooser chooser) throws IOException {
+        assert uri != null : "File URI must not be null.";
+        assert chooser != null : "URIChooser must not be null.";
+
+        JFileURIChooser fc = (JFileURIChooser) chooser;
+        Drawing drawing = createDrawing();
+        InputFormat format = getSelectedInputFormat(fc);
+        boolean success = tryReadWithFormat(uri, drawing, format);
+
+        if (!success) success = tryReadWithAllFormats(uri, drawing, format);
+        if (!success) throwUnsupportedFormat(uri);
+
+        updateDrawingOnEDT(drawing);
+    }
+
+    protected InputFormat getSelectedInputFormat(JFileURIChooser fc) {
+        if (fc == null) return null;
+        HashMap<FileFilter, InputFormat> map =
+                (HashMap<FileFilter, InputFormat>) fc.getClientProperty(SVGApplicationModel.INPUT_FORMAT_MAP_CLIENT_PROPERTY);
+        if (map == null) {
+            return null;
+        }
+        return map.get(fc.getFileFilter());
+    }
+
+    protected boolean tryReadWithFormat(URI uri, Drawing drawing, InputFormat format) {
+        assert uri != null : "URI argument must not be null.";
+        assert drawing != null : "Drawing argument must not be null.";
+
+        if (format == null) return false;
         try {
-            JFileURIChooser fc = (JFileURIChooser) chooser;
-            final Drawing drawing = createDrawing();
-            // We start with the selected uri format in the uri chooser,
-            // and then try out all formats we can import.
-            // We need to try out all formats, because the user may have
-            // chosen to load a uri without having used the uri chooser.
-            HashMap<javax.swing.filechooser.FileFilter, InputFormat> fileFilterInputFormatMap = null;
-            if (fc != null) {
-                fileFilterInputFormatMap = (HashMap<javax.swing.filechooser.FileFilter, InputFormat>) fc.getClientProperty(SVGApplicationModel.INPUT_FORMAT_MAP_CLIENT_PROPERTY);
-            }
-            //private HashMap<javax.swing.filechooser.FileFilter, OutputFormat> fileFilterOutputFormatMap;
-            InputFormat selectedFormat = (fc == null) ? null : fileFilterInputFormatMap.get(fc.getFileFilter());
-            boolean success = false;
-            if (selectedFormat != null) {
-                try {
-                    selectedFormat.read(uri, drawing, true);
-                    success = true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    // try with the next input format
-                }
-            }
-            if (!success) {
-                for (InputFormat sfi : drawing.getInputFormats()) {
-                    if (sfi != selectedFormat) {
-                        try {
-                            sfi.read(uri, drawing, true);
-                            success = true;
-                            break;
-                        } catch (Exception e) {
-                            // try with the next input format
-                        }
-                    }
-                }
-            }
-            if (!success) {
-                ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.app.Labels");
-                throw new IOException(labels.getFormatted("file.open.unsupportedFileFormat.message", URIUtil.getName(uri)));
-            }
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    Drawing oldDrawing = svgPanel.getDrawing();
-                    svgPanel.setDrawing(drawing);
-                    firePropertyChange(DRAWING_PROPERTY, oldDrawing, svgPanel.getDrawing());
-                    undo.discardAllEdits();
-                }
+            format.read(uri, drawing, true);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected boolean tryReadWithAllFormats(URI uri, Drawing drawing, InputFormat selected) {
+        assert uri != null : "URI argument must not be null.";
+        assert drawing != null : "Drawing argument must not be null.";
+        for (InputFormat fmt : drawing.getInputFormats()) {
+            if (fmt == selected) continue;
+            if (tryReadWithFormat(uri, drawing, fmt)) return true;
+        }
+        return false;
+    }
+
+    protected void throwUnsupportedFormat(URI uri) throws IOException {
+        ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.app.Labels");
+        throw new IOException(labels.getFormatted("file.open.unsupportedFileFormat.message", URIUtil.getName(uri)));
+    }
+
+    protected void updateDrawingOnEDT(final Drawing drawing)
+            throws IOException {
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                Drawing oldDrawing = svgPanel.getDrawing();
+                svgPanel.setDrawing(drawing);
+                firePropertyChange(DRAWING_PROPERTY, oldDrawing, svgPanel.getDrawing());
+                undo.discardAllEdits();
             });
-        } catch (InterruptedException e) {
-            InternalError error = new InternalError();
-            e.initCause(e);
-            throw error;
-        } catch (InvocationTargetException e) {
-            InternalError error = new InternalError();
-            error.initCause(e);
-            throw error;
+        } catch (InterruptedException | InvocationTargetException e) {
+            throw new IOException(e);
         }
     }
 
