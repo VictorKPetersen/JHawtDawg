@@ -21,7 +21,6 @@ import org.jhotdraw.util.ResourceBundleUtil;
  */
 public class SendToBackAction extends AbstractSelectedAction {
 
-    private static final long serialVersionUID = 1L;
     public static final String ID = "edit.sendToBack";
 
     /**
@@ -41,8 +40,6 @@ public class SendToBackAction extends AbstractSelectedAction {
         final LinkedList<Figure> figures = new LinkedList<>(view.getSelectedFigures());
         sendToBack(view, figures);
         fireUndoableEditHappened(new AbstractUndoableEdit() {
-            private static final long serialVersionUID = 1L;
-
             @Override
             public String getPresentationName() {
                 ResourceBundleUtil labels
@@ -66,7 +63,11 @@ public class SendToBackAction extends AbstractSelectedAction {
 
     public static void sendToBack(DrawingView view, Collection<Figure> figures) {
         Drawing drawing = view.getDrawing();
-        for (Figure figure : figures) { // XXX Shouldn't the figures be sorted here back to front?
+
+        List<Figure> sortedFigures = drawing.sort(figures);
+        Collections.reverse(sortedFigures);
+
+        for (Figure figure : sortedFigures) {
             drawing.sendToBack(figure);
         }
     }
